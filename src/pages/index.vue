@@ -1,6 +1,6 @@
 <template>
   <div class="p-main">
-    <section class="main-head" ref="head" @click="vControl('GETMOUSEPOSINPIC',this)">
+    <section class="main-head" ref="head" @click="vControl('GETMOUSEPOSINPIC')">
       <canvas ref="canvasHead" width="width" height="400"></canvas>
     </section>
     <section></section>
@@ -52,20 +52,35 @@ export default {
     getAbsPos (p) {
       let _x = 0
       let _y = 0
-      while(p.offsetParent){
+      while (p.offsetParent) {
         _x += p.offsetLeft
         _y += p.offsetTop
         p = p.offsetParent
       }
       _x += p.offsetLeft
       _y += p.offsetTop
-      return {x:_x, y:_y}
+      return {x: _x, y: _y}
     },
-    vControl(pChoice){
-      switch(pChoice){
-        case "GETMOUSEPOSINPIC":
-          let mPos = JPos.$getMousePos()
-          let iPos = JPos.$getAbsPos(arguments[1])
+    getMousePos (evt) {
+      let _x = 0
+      let _y = 0
+      evt = evt || window.event
+      if (evt.pageX || evt.pageY) {
+        _x = evt.pageX
+        _y = evt.pageY
+      } else if (evt.clientX || evt.clientY) {
+        _x = evt.clientX + document.body.scrollLeft - document.body.clientLeft
+        _y = evt.clientY + document.body.scrollTop - document.body.clientTop
+      } else {
+        return this.getAbsPos(evt.target)
+      }
+      return {x: _x, y: _y}
+    },
+    vControl (pChoice) {
+      switch (pChoice) {
+        case 'GETMOUSEPOSINPIC':
+          let mPos = this.getMousePos()
+          let iPos = this.getAbsPos(this.$refs.head)
           window.status = (mPos.x - iPos.x) + ' ' + (mPos.y - iPos.y)
           alert('x : ' + (mPos.x - iPos.x) + ', y : ' + (mPos.y - iPos.y))
           break
